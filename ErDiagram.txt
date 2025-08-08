@@ -1,0 +1,131 @@
+This is an ER (Entity-Relationship) diagram that represents a database structure related to a note-taking or content management system. Let's break it down entity by entity and explain how they are related:
+
+🔵 Entities and Their Attributes
+1. User
+Represents users of the system.
+
+id (Primary Key)
+
+first name
+
+last name
+
+email
+
+password
+
+mob no
+
+roles
+
+2. Notes
+Represents notes created by users.
+
+id (Primary Key)
+
+title
+
+description
+
+category → References Category
+
+user → References User
+
+publish_date
+
+last_update_date
+
+file → References File (attached file)
+
+🔗 Relationships:
+
+Belongs to a User
+
+Belongs to a Category
+
+Can have one or more File(s)
+
+3. File
+Stores metadata about files uploaded with notes.
+
+id (Primary Key)
+
+original_file_name
+
+upload_file_name
+
+display_file_name
+
+file_size
+
+path
+
+🔗 Relationships:
+
+Linked to Notes (used as an attachment or reference)
+
+4. Category
+Organizes notes into logical groups.
+
+id (Primary Key)
+
+name
+
+is_active
+
+is_delete
+
+created_by
+
+created_date
+
+updated_by
+
+updated_date
+
+🔗 Relationships:
+
+Referenced by Notes
+
+5. Todo
+Represents tasks or to-dos, possibly related to users or notes.
+
+id (Primary Key)
+
+title
+
+description
+
+priority
+
+status
+
+publish_date
+
+last_update_date
+
+📌 Note: This entity seems to be standalone – there’s no explicit relationship shown with others, but it's likely connected to users or notes in application logic.
+
+🔗 Summary of Relationships
+User → creates → Notes
+
+Notes → belong to → Category
+
+Notes → can have → File(s)
+
+Category → has → metadata like created_by, updated_by (likely referencing User by id but not shown directly)
+
+🧠 Interpretation
+This system seems to support:
+
+User-based note creation
+
+Notes can belong to categories
+
+Notes can have attachments
+
+There’s a task management component (Todo)
+
+File uploads are managed separately, probably for reusability or logging
+
+Let me know if you want a relational schema (SQL), sample data, or how to implement this in a backend.
