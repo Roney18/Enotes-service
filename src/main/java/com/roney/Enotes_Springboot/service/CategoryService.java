@@ -1,8 +1,9 @@
 package com.roney.Enotes_Springboot.service;
 
+import com.roney.Enotes_Springboot.dto.CategoryDto;
 import com.roney.Enotes_Springboot.model.Category;
 import com.roney.Enotes_Springboot.repository.CategoryRepo;
-import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,9 @@ public class CategoryService {
     @Autowired
     private CategoryRepo categoryRepo;
 
+    @Autowired
+    private ModelMapper mapper;
+
     public ResponseEntity<?> getAllCategories() {
         List<Category> cat = categoryRepo.findAll();
         if(CollectionUtils.isEmpty(cat)){
@@ -27,13 +31,14 @@ public class CategoryService {
         return ResponseEntity.ok(cat);
     }
 
-    public ResponseEntity<?> saveCategory(Category category) {
-        List<Category> cat = categoryRepo.findAll();
-        if (cat.stream()
-                .anyMatch(cp -> cp.getName().equalsIgnoreCase(category.getName()))) {
+    public ResponseEntity<?> saveCategory(CategoryDto cat) {
+        List<Category> cats = categoryRepo.findAll();
+        if (cats.stream()
+                .anyMatch(cp -> cp.getName().equalsIgnoreCase(cat.getName()))) {
             return new ResponseEntity<>("already there", HttpStatus.BAD_REQUEST);
         } else {
             try {
+                Category category = mapper.map(cat, Category.class);
                 category.setIsActive(true);
                 category.setCreatedBy(1);
                 category.setCreatedDate(new Date());
