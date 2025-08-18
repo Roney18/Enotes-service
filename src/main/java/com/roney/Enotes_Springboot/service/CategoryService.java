@@ -1,6 +1,7 @@
 package com.roney.Enotes_Springboot.service;
 
 import com.roney.Enotes_Springboot.dto.CategoryDto;
+import com.roney.Enotes_Springboot.dto.CategoryResponse;
 import com.roney.Enotes_Springboot.model.Category;
 import com.roney.Enotes_Springboot.repository.CategoryRepo;
 import org.modelmapper.ModelMapper;
@@ -25,10 +26,11 @@ public class CategoryService {
 
     public ResponseEntity<?> getAllCategories() {
         List<Category> cat = categoryRepo.findAll();
-        if(CollectionUtils.isEmpty(cat)){
+        List<CategoryDto> categoryDtoList = cat.stream().map(cate->mapper.map(cate,CategoryDto.class)).toList();
+        if(CollectionUtils.isEmpty(categoryDtoList)){
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(cat);
+        return ResponseEntity.ok(categoryDtoList);
     }
 
     public ResponseEntity<?> saveCategory(CategoryDto cat) {
@@ -48,6 +50,17 @@ public class CategoryService {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+        }
+    }
+
+    public ResponseEntity<?> getActiveCategory() {
+        List<Category> cat = categoryRepo.findByIsActiveTrue();
+        List<CategoryResponse> categoryResponseList = cat.stream().map(cate->mapper.map(cate,CategoryResponse.class)).toList();
+        if(categoryResponseList.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+        else {
+            return ResponseEntity.ok(categoryResponseList);
         }
     }
 }
