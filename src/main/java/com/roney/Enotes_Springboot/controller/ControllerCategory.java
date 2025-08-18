@@ -28,4 +28,9 @@ public class ControllerCategory {
         CategoryDto category = mapper.map(cat,CategoryDto.class);
         return categoryService.saveCategory(category);
     }
+
+    @GetMapping("/active-category")
+    public ResponseEntity<?> getActiveCategory(){
+        return categoryService.getActiveCategory();
+    }
 }
