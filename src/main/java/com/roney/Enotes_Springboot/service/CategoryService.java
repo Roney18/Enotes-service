@@ -10,9 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CategoryService {
@@ -61,6 +63,29 @@ public class CategoryService {
         }
         else {
             return ResponseEntity.ok(categoryResponseList);
+        }
+    }
+
+    public ResponseEntity<?> getCategoryByID(int id) {
+        Optional<Category> cat = categoryRepo.findById(id);
+        CategoryDto categoryResponse = mapper.map(cat,CategoryDto.class);
+        if(ObjectUtils.isEmpty(categoryResponse)){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(categoryResponse);
+    }
+
+    public ResponseEntity<?> DeleteCategoryByID(int id) {
+        Optional<Category> cat = categoryRepo.findById(id);
+        if(cat.isPresent()){
+            Category category = cat.get();
+            category.setIsDeleted(true);
+            category.setIsActive(false);
+            categoryRepo.save(category);
+            return ResponseEntity.ok().build();
+        }
+        else {
+            return ResponseEntity.notFound().build();
         }
     }
 }
