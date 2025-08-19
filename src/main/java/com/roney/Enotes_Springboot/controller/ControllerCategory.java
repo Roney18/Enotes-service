@@ -33,4 +33,13 @@ public class ControllerCategory {
     public ResponseEntity<?> getActiveCategory(){
         return categoryService.getActiveCategory();
     }
+
+    @GetMapping("{id")
+    public ResponseEntity<?> getCategoryById(@PathVariable int id){
+        return categoryService.getCategoryByID(id);
+    }
+    @GetMapping("{id")
+    public ResponseEntity<?> DeleteCategoryById(@PathVariable int id){
+        return categoryService.DeleteCategoryByID(id);
+    }
 }
