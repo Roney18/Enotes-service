@@ -6,7 +6,6 @@ import com.roney.Enotes_Springboot.model.Category;
 import com.roney.Enotes_Springboot.repository.CategoryRepo;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -38,8 +37,8 @@ public class CategoryService {
     public ResponseEntity<?> saveCategory(CategoryDto cat) {
         List<Category> cats = categoryRepo.findAll();
         if (cats.stream()
-                .anyMatch(cp -> cp.getName().equalsIgnoreCase(cat.getName()))) {
-            return new ResponseEntity<>("already there", HttpStatus.BAD_REQUEST);
+                .anyMatch(cp -> cp.getId()==cat.getId())) {
+            return updateCategory(cat);
         } else {
             try {
                 Category category = mapper.map(cat, Category.class);
@@ -53,6 +52,22 @@ public class CategoryService {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    private ResponseEntity<?> updateCategory(CategoryDto cat) {
+        Optional<Category> category = categoryRepo.findById(cat.getId());
+        if(category.isPresent()) {
+            Category cats = category.get();
+            cats.setIsActive(cat.getIsActive());
+            cats.setIsDeleted(cat.getIsDeleted());
+            cats.setCreatedBy(cat.getCreatedBy());
+            cats.setCreatedDate(cat.getCreatedDate());
+
+            cats.setUpdateBy(1);
+            cats.setUpdatedDate(new Date());
+            return ResponseEntity.ok(cats);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     public ResponseEntity<?> getActiveCategory() {

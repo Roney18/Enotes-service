@@ -16,7 +16,7 @@ public class CategoryDto {
     private String name;
     private String description;
     private Boolean isActive;
-//    private Boolean isDeleted;
+    private Boolean isDeleted;
     private int createdBy;
     private Date createdDate;
     private int updateBy;
