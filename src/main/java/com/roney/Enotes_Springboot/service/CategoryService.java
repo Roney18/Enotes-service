@@ -2,11 +2,11 @@ package com.roney.Enotes_Springboot.service;
 
 import com.roney.Enotes_Springboot.dto.CategoryDto;
 import com.roney.Enotes_Springboot.dto.CategoryResponse;
+import com.roney.Enotes_Springboot.exception.ResourceNotFoundException;
 import com.roney.Enotes_Springboot.model.Category;
 import com.roney.Enotes_Springboot.repository.CategoryRepo;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -38,8 +38,8 @@ public class CategoryService {
     public ResponseEntity<?> saveCategory(CategoryDto cat) {
         List<Category> cats = categoryRepo.findAll();
         if (cats.stream()
-                .anyMatch(cp -> cp.getName().equalsIgnoreCase(cat.getName()))) {
-            return new ResponseEntity<>("already there", HttpStatus.BAD_REQUEST);
+                .anyMatch(cp -> cp.getId()==cat.getId())) {
+            return updateCategory(cat);
         } else {
             try {
                 Category category = mapper.map(cat, Category.class);
@@ -55,6 +55,22 @@ public class CategoryService {
         }
     }
 
+    private ResponseEntity<?> updateCategory(CategoryDto cat) {
+        Optional<Category> category = categoryRepo.findById(cat.getId());
+        if(category.isPresent()) {
+            Category cats = category.get();
+            cats.setIsActive(cat.getIsActive());
+            cats.setIsDeleted(cat.getIsDeleted());
+            cats.setCreatedBy(cat.getCreatedBy());
+            cats.setCreatedDate(cat.getCreatedDate());
+
+            cats.setUpdateBy(1);
+            cats.setUpdatedDate(new Date());
+            return ResponseEntity.ok(cats);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
     public ResponseEntity<?> getActiveCategory() {
         List<Category> cat = categoryRepo.findByIsActiveTrue();
         List<CategoryResponse> categoryResponseList = cat.stream().map(cate->mapper.map(cate,CategoryResponse.class)).toList();
@@ -66,13 +82,14 @@ public class CategoryService {
         }
     }
 
-    public ResponseEntity<?> getCategoryByID(int id) {
-        Optional<Category> cat = categoryRepo.findById(id);
-        CategoryDto categoryResponse = mapper.map(cat,CategoryDto.class);
-        if(ObjectUtils.isEmpty(categoryResponse)){
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> getCategoryByID(int id) throws Exception {
+        Category cat = categoryRepo.findByIdAndIsDeletedFalse(id).orElseThrow(()-> new ResourceNotFoundException("Category not found with this id"));
+
+        if(!ObjectUtils.isEmpty(cat)){
+            CategoryDto categoryResponse = mapper.map(cat,CategoryDto.class);
+            return ResponseEntity.ok(categoryResponse);
         }
-        return ResponseEntity.ok(categoryResponse);
+        return null;
     }
 
     public ResponseEntity<?> DeleteCategoryByID(int id) {
