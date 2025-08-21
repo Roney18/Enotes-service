@@ -2,6 +2,7 @@ package com.roney.Enotes_Springboot.service;
 
 import com.roney.Enotes_Springboot.dto.CategoryDto;
 import com.roney.Enotes_Springboot.dto.CategoryResponse;
+import com.roney.Enotes_Springboot.exception.ResourceNotFoundException;
 import com.roney.Enotes_Springboot.model.Category;
 import com.roney.Enotes_Springboot.repository.CategoryRepo;
 import org.modelmapper.ModelMapper;
@@ -81,13 +82,14 @@ public class CategoryService {
         }
     }
 
-    public ResponseEntity<?> getCategoryByID(int id) {
-        Optional<Category> cat = categoryRepo.findById(id);
-        CategoryDto categoryResponse = mapper.map(cat,CategoryDto.class);
-        if(ObjectUtils.isEmpty(categoryResponse)){
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> getCategoryByID(int id) throws Exception {
+        Category cat = categoryRepo.findByIdAndIsDeletedFalse(id).orElseThrow(()-> new ResourceNotFoundException("Category not found with this id"));
+
+        if(!ObjectUtils.isEmpty(cat)){
+            CategoryDto categoryResponse = mapper.map(cat,CategoryDto.class);
+            return ResponseEntity.ok(categoryResponse);
         }
-        return ResponseEntity.ok(categoryResponse);
+        return null;
     }
 
     public ResponseEntity<?> DeleteCategoryByID(int id) {

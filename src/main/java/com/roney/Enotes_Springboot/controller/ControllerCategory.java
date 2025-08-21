@@ -35,7 +35,7 @@ public class ControllerCategory {
     }
 
     @GetMapping("{id")
-    public ResponseEntity<?> getCategoryById(@PathVariable int id){
+    public ResponseEntity<?> getCategoryById(@PathVariable int id) throws Exception {
         return categoryService.getCategoryByID(id);
     }
     @GetMapping("{id")
