@@ -35,19 +35,20 @@ public class CategoryService {
         return ResponseEntity.ok(categoryDtoList);
     }
 
-    public ResponseEntity<?> saveCategory(CategoryDto cat) {
+    public ResponseEntity<?> saveCategory(Category cat) {
         List<Category> cats = categoryRepo.findAll();
         if (cats.stream()
-                .anyMatch(cp -> cp.getId()==cat.getId())) {
+                .anyMatch(cp -> cp.getName().equals(cat.getName()))) {
+            System.out.println("entering the update block");
             return updateCategory(cat);
         } else {
             try {
-                Category category = mapper.map(cat, Category.class);
-                category.setIsActive(true);
-                category.setCreatedBy(1);
-                category.setCreatedDate(new Date());
-                category.setIsDeleted(false);
-                Category category1 = categoryRepo.save(category);
+                System.out.println("entering the new block");
+                cat.setIsActive(true);
+                cat.setCreatedBy(1);
+                cat.setCreatedDate(new Date());
+                cat.setIsDeleted(false);
+                Category category1 = categoryRepo.save(cat);
                 return ResponseEntity.ok(category1);
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -55,20 +56,25 @@ public class CategoryService {
         }
     }
 
-    private ResponseEntity<?> updateCategory(CategoryDto cat) {
-        Optional<Category> category = categoryRepo.findById(cat.getId());
+    private ResponseEntity<?> updateCategory(Category cat) {
+        System.out.println("hiee");
+        Optional<Category> category = categoryRepo.findByName(cat.getName());
+        System.out.println(category.isPresent());
         if(category.isPresent()) {
             Category cats = category.get();
-            cats.setIsActive(cat.getIsActive());
-            cats.setIsDeleted(cat.getIsDeleted());
-            cats.setCreatedBy(cat.getCreatedBy());
-            cats.setCreatedDate(cat.getCreatedDate());
+            cats.setDescription(cat.getDescription());
+//            cats.setIsActive(cat.getIsActive());
+//            cats.setIsDeleted(cat.getIsDeleted());
+//            cats.setCreatedBy(cat.getCreatedBy());
+//            cats.setCreatedDate(cat.getCreatedDate());
 
             cats.setUpdateBy(1);
             cats.setUpdatedDate(new Date());
-            return ResponseEntity.ok(cats);
+            Category updated = categoryRepo.save(cats);
+            return ResponseEntity.ok(updated);
         }
-        return ResponseEntity.notFound().build();
+        else
+            return ResponseEntity.notFound().build();
     }
 
     public ResponseEntity<?> getActiveCategory() {
