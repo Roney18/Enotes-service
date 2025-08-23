@@ -25,8 +25,8 @@ public class ControllerCategory {
 
     @PostMapping("/category")
     public ResponseEntity<?> saveCategory(@RequestBody Category cat){
-        CategoryDto category = mapper.map(cat,CategoryDto.class);
-        return categoryService.saveCategory(category);
+//        CategoryDto category = mapper.map(cat,CategoryDto.class);
+        return categoryService.saveCategory(cat);
     }
 
     @GetMapping("/active-category")
@@ -34,11 +34,11 @@ public class ControllerCategory {
         return categoryService.getActiveCategory();
     }
 
-    @GetMapping("{id")
+    @GetMapping("{id}")
     public ResponseEntity<?> getCategoryById(@PathVariable int id) throws Exception {
         return categoryService.getCategoryByID(id);
     }
-    @GetMapping("{id")
+    @DeleteMapping("{id}")
     public ResponseEntity<?> DeleteCategoryById(@PathVariable int id){
         return categoryService.DeleteCategoryByID(id);
     }
